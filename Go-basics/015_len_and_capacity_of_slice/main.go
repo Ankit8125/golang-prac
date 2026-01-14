@@ -4,7 +4,7 @@ import "fmt"
 
 func main(){
 
-	// make([], length, capacity)
+	// make([] datatype, length, capacity)
 	scores := make([] int, 0, 2)
 	fmt.Println(len(scores), cap(scores), scores)
 
