@@ -14,9 +14,9 @@ import (
 In Node.js with Mongoose, you write: await mongoose.connect('mongodb://...');
 And it handles everything internally. Go requires explicit resource management because Go doesn't have automatic garbage collection for non-memory resources (like database connections).
 */
- 
+
 // Refer Obsidian to get analogy of the below function.
-func Connect (cfg config.Config) (*mongo.Client, *mongo.Database, error) {
+func Connect(cfg config.Config) (*mongo.Client, *mongo.Database, error) {
 	// This function returns three things: the client, the database, and an error.
 
 	// Step 1: Create a Context with Timeout
@@ -34,14 +34,14 @@ func Connect (cfg config.Config) (*mongo.Client, *mongo.Database, error) {
 	// Step 3: Establish Connection
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Mongo connect failed")
+		return nil, nil, fmt.Errorf("Mongo connect failed: %v", err)
 	}
 	// mongo.Connect() does NOT immediately connect to MongoDB. It creates a client object and queues the connection attempt
 	// If something goes wrong (invalid URI, network issue at client creation), it returns an error. We return nil values and an error if it fails.
 
 	// Step 4: Verify Connection Works (Ping)
 	if err := client.Ping(ctx, nil); err != nil {
-		return nil, nil, fmt.Errorf("Mongo ping failed ")
+		return nil, nil, fmt.Errorf("Mongo ping failed: %v", err)
 	}
 	// This is the actual connection verification! Ping() sends a test command to MongoDB. This confirms the connection is actually working before we return
 	// If MongoDB is down or unreachable, this will fail. Again, uses the 10-second timeout context
@@ -53,7 +53,7 @@ func Connect (cfg config.Config) (*mongo.Client, *mongo.Database, error) {
 	return client, database, nil
 }
 
-func Disconnect (client *mongo.Client) error {
+func Disconnect(client *mongo.Client) error {
 
 	// Create a context with 5-second timeout (shorter than connect—cleanup should be faster)
 	// Disconnect gracefully - closes all open connections
