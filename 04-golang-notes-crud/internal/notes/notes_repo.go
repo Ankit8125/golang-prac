@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Repo (repository) -> Data access layer -> This is where you are going to interact with the DB
+// Repo (repository) -> Data access / Database layer -> This is going to interact with the DB
 
 type Repo struct {
 	coll *mongo.Collection // this is going to represent 1 single MongoDB connection like a table.
@@ -20,7 +20,10 @@ func NewRepo (db *mongo.Database) *Repo {
 	}
 }
 
-func (r *Repo) Create (ctx context.Context, note Note) (Note, error) {
+func (r *Repo) Create (ctx context.Context, note Note) (Note, error) { 
+	// (r *Repo): This makes the function a METHOD, not a plain function.
+	// Meaning in plain English: “This function belongs to Repo.”
+	
 	childCtx, cancel := context.WithTimeout(ctx, 5*time.Second) // context.WithTimeout() creates a new context that cancels after some time. Sometimes DB operations fails, so to avoid hanging of server, we are doing this.
 	// ctx -> context from HTTP request
 	// childCtx -> child context with additional 5 second timeout
