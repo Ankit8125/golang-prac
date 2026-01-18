@@ -13,5 +13,6 @@ func RegisterRoutes (r *gin.Engine, db *mongo.Database) {
 	notesGroup := r.Group("/notes") // This will be my parent node ("/notes")
 	{
 		notesGroup.POST("", h.CreateNote) // POST Req: -> /notes -> will run "CreateNote"
+		notesGroup.GET("", h.ListNotes)
 	}
 }
