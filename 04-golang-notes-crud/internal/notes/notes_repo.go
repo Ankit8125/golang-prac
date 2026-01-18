@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Repo (repository) -> Data access / Database layer -> This is going to interact with the DB
@@ -65,4 +67,20 @@ func (r* Repo) List (ctx context.Context) ([] Note, error) { // returns list of 
 	}
 
 	return notes, nil
+}
+
+func (r* Repo) GetByID (ctx context.Context, id primitive.ObjectID) (Note, error) {
+	childCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": id} // in bson we are storing as "_id", but in postman we are seeing as "id"
+
+	var note Note
+	
+	err := r.coll.FindOne(childCtx, filter, options.FindOne()).Decode(&note) // FindOne doesn't return a cursor. It returns a single data
+	if err != nil {
+		return Note{}, fmt.Errorf("Find note by id failed: %w", err)
+	}
+
+	return note, nil
 }

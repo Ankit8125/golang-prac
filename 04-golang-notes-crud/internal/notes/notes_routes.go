@@ -14,5 +14,6 @@ func RegisterRoutes (r *gin.Engine, db *mongo.Database) {
 	{
 		notesGroup.POST("", h.CreateNote) // POST Req: -> /notes -> will run "CreateNote"
 		notesGroup.GET("", h.ListNotes)
+		notesGroup.GET("/:id", h.GetNoteByID) // We have to write "/:id" so that gin will understand and capture the ID (in notes_handler.go)
 	}
-}
+} 
