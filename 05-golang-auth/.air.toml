@@ -1,0 +1,12 @@
+root = "."                    # Project root directory
+tmp_dir = "tmp"              # Where Air stores temporary build files
+
+[build]
+cmd = "go build -o ./tmp/api.exe ./cmd/api"  # Build command (compile Go code)
+bin = "tmp/api.exe"                           # Path to the compiled executable to run
+delay = 300                                   # Delay (ms) before rebuilding after file changes
+exclude_dir = ["tmp", "vendor"]              # Don't watch these directories
+exclude_regex = ["_test.go"]                 # Don't watch test files
+
+[log]
+time = true                  # Show timestamps in logs
