@@ -106,3 +106,42 @@ func (h* Handler) GetNoteByID (c *gin.Context) {
 		"note": note,
 	})
 }
+
+func (h* Handler) UpdateNoteByID (c *gin.Context) {
+	idStr := c.Param("id")
+
+	objId, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid ID",
+		})
+		return
+	}
+
+	var req UpdateNoteRequest
+
+	// Validating our JSON which we are passing from client side 
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid JSON format",
+		})
+		return 
+	}
+
+	updated, err := h.repo.UpdateByID(c.Request.Context(), objId, req)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "Note not found for that given ID.",
+			})
+			return 
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch the note.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, updated)
+}
