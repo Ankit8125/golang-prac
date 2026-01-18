@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"go-auth/internal/app"
 	"go-auth/internal/httpserver"
 	"log"
 	"net/http"
@@ -8,6 +10,25 @@ import (
 )
 
 func main () {
+
+	// Step 1: Creating our root context
+	// Root context: We use context.Background() whenever we are doing a startup or we need a the starting parent context.
+	ctx := context.Background()
+	
+	// Step 2: Passing the root context in app.new; App.new()
+	// 		  - Loads the env
+	// 		  - Makes the DB connection
+	a, err := app.New(ctx)
+	if err != nil {
+		log.Fatalf("Startup failed: %v", err)
+	}
+
+	defer func () {
+		if err := a.Close(ctx); err != nil {
+			log.Printf("Shutdown warning: %v", err)
+		}
+	} ()
+
 	// Here we are creating the server and listening to the server
 	router := httpserver.NewRouter()
 
