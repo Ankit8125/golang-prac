@@ -29,6 +29,11 @@ type RegisterInput struct {
 	Password string `json:"password"`
 }
 
+type LoginInput struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
 type AuthResult struct {
 	Token string `json:"token"`
 	User PublicUser `json:"user"`
@@ -88,5 +93,42 @@ func (s *Service) Register (ctx context.Context, input RegisterInput) (AuthResul
 	return AuthResult{
 		Token: token,
 		User: ToPublic(created),
+	}, nil
+}
+
+func (s *Service) Login (ctx context.Context, input LoginInput) (AuthResult, error) {
+	email := strings.ToLower(strings.TrimSpace(input.Email))
+	pass := strings.ToLower(strings.TrimSpace(input.Password))
+
+	if email == "" || pass == "" {
+		return AuthResult{}, errors.New("Email and Password are required")
+	}
+
+	// Password validation
+	if len(pass) < 4 {
+		return AuthResult{}, errors.New("Password must be atleast 4 characters long")
+	}
+
+	user,  err := s.repo.FindByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return AuthResult{}, errors.New("Invalid email or password")
+		}
+		return AuthResult{}, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([] byte (user.PasswordHash), [] byte (pass)) // hashedPassword - stored in DB
+	if err != nil {
+		return AuthResult{}, errors.New("Invalid email or password")
+	}
+
+	token, err := auth.CreateToken(s.jwtSecret, user.ID.Hex(), user.Role)
+	if err != nil {
+		return AuthResult{}, err
+	}
+
+	return AuthResult{
+		Token: token,
+		User: ToPublic(user),
 	}, nil
 }
