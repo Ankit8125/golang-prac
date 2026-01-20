@@ -26,7 +26,7 @@ func CreateToken (jwtSecret string, userID string, role string) (string, error) 
 		Role: role,
 	}
 
-	tok := jwt.NewWithClaims(jwt.SigningMethodES256, claims) // NewWithClaims creates a new Token with the specified signing method and claims.
+	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) // NewWithClaims creates a new Token with the specified signing method and claims.
 
 	signed, err := tok.SignedString([] byte (jwtSecret))
 	if err != nil {

@@ -1,8 +1,13 @@
 package httpserver
 
-import "github.com/gin-gonic/gin"
+import (
+	"go-auth/internal/app"
+	"go-auth/internal/user"
 
-func NewRouter () *gin.Engine {
+	"github.com/gin-gonic/gin"
+)
+
+func NewRouter (a *app.App) *gin.Engine {
 	// Creating a new router instance
 	r := gin.New() // New returns a new blank Engine instance without any middleware attached
 
@@ -11,5 +16,12 @@ func NewRouter () *gin.Engine {
 
 	r.GET("/health", health)
 
+	userRepo := user.NewRepo(a.DB)
+
+	userSvc := user.NewService(userRepo, a.Config.JWTSecret)
+	userHandler := user.NewHandler(userSvc)
+
+	r.POST("/register", userHandler.Register)
+
 	return r
-}
+} 

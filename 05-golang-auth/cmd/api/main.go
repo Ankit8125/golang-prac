@@ -30,7 +30,7 @@ func main () {
 	} ()
 
 	// Here we are creating the server and listening to the server
-	router := httpserver.NewRouter()
+	router := httpserver.NewRouter(a) // We are passing this "a", because we are getting the config and DB
 
 	// Standard go type that runs a http server
 	srv := &http.Server {

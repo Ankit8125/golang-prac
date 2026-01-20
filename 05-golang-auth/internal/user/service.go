@@ -50,11 +50,13 @@ func (s *Service) Register (ctx context.Context, input RegisterInput) (AuthResul
 	}
 
 	_, err := s.repo.FindByEmail(ctx, email)
-	if err != nil {
+	if err == nil {
+		// User found - email already exists
 		return AuthResult{}, errors.New("Email is already registered. Please try with a different email.")
 	}
 
-	if err != nil && !errors.Is(err, mongo.ErrNilDocument) {
+ 	if !errors.Is(err, mongo.ErrNoDocuments) {
+		// Some other database error occurred
 		return AuthResult{}, err
 	}
 
