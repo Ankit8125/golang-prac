@@ -1,13 +1,11 @@
 package middleware
 
 import (
-	"fmt"
 	"go-auth/internal/auth"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 // Store -> auth data info -> gin context
