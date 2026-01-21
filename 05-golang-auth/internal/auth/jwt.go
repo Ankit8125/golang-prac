@@ -44,7 +44,7 @@ func ParseToken(jwtSecret string, tokenString string) (Claims, error) {
 	parsed, err := jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface {}, error) { // Imp: ParseWithClaims	
 		// Verify the algorithm
 		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
-			return nil, fmt.Errorf("Unexpected signing method: %w", t.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
 		}
 
 		return [] byte (jwtSecret), nil // retrieves the secret key.
